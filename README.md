@@ -38,6 +38,14 @@ public class MyApp : FileBasedApplication
         // Your application logic here
     }
 }
+
+// Usage example:
+public static void Main(string[] args)
+{
+    var app = new MyApp();
+    app.Build().ConfigureServices();
+    app.Run();
+}
 ```
 
 ### Asynchronous Application
@@ -53,7 +61,7 @@ public class MyAsyncApp : AsyncFileBasedApplication
         base.SetupServices();
     }
 
-    public override async Task RunAsync()
+    public override async Task Run()
     {
         // Your asynchronous application logic here
     }
@@ -64,7 +72,7 @@ public static async Task Main(string[] args)
 {
     var app = new MyAsyncApp();
     app.Build().ConfigureServices();
-    await app.RunAsync();
+    await app.Run();
 }
 ```
 
