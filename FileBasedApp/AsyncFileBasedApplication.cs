@@ -6,7 +6,6 @@ public abstract class AsyncFileBasedApplication : FileBasedApplicationBase
 {
     public AsyncFileBasedApplication Build()
     {
-        Console.WriteLine("Build");
         this.SetupBuild();
         
         this._configuration = this._configurationBuilder.Build();
@@ -15,7 +14,6 @@ public abstract class AsyncFileBasedApplication : FileBasedApplicationBase
 
     public AsyncFileBasedApplication ConfigureServices()
     {
-        Console.WriteLine("ConfigureServices");
         this.SetupServices();
 
         this._serviceProvider = this._serviceCollection.BuildServiceProvider(this._serviceProviderOptions);
