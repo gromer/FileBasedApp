@@ -58,6 +58,14 @@ public class MyAsyncApp : AsyncFileBasedApplication
         // Your asynchronous application logic here
     }
 }
+
+// Usage example:
+public static async Task Main(string[] args)
+{
+    var app = new MyAsyncApp();
+    app.Build().ConfigureServices();
+    await app.RunAsync();
+}
 ```
 
 ## Publishing to NuGet
