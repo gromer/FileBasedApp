@@ -1,0 +1,35 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore FileBasedApp/FileBasedApp.csproj
+    
+    - name: Build
+      run: dotnet build FileBasedApp/FileBasedApp.csproj -c Release --no-restore
+    
+    - name: Pack (validation)
+      run: dotnet pack FileBasedApp/FileBasedApp.csproj -c Release --no-build -o ./artifacts
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package-preview
+        path: ./artifacts/*.nupkg
