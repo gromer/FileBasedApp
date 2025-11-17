@@ -22,90 +22,101 @@ dotnet add package FileBasedApp
 
 ### Synchronous Application
 
+Save this to `HelloWorld.cs`.
+
 ```csharp
+#:package FileBasedApp@0.1.0
+
 using FileBasedApp;
 
-public class MyApp : FileBasedApplication
-{
-    public override void SetupServices()
-    {
-        // Configure your services here
-        base.SetupServices();
-    }
+new HelloWorld()
+    .Build()
+    .ConfigureServices()
+    .Run();
 
+class HelloWorld : FileBasedApplication
+{
     public override void Run()
     {
-        // Your application logic here
+        Console.WriteLine("Hello, World!");
     }
-}
-
-// Usage example:
-public static void Main(string[] args)
-{
-    var app = new MyApp();
-    app.Build().ConfigureServices();
-    app.Run();
 }
 ```
 
+Run with `dotnet HelloWorld.cs`.
+
 ### Asynchronous Application
 
-```csharp
-using FileBasedApp;
+Save this to `CurrentWeatherApplication.cs`.
 
-public class MyAsyncApp : AsyncFileBasedApplication
+```csharp
+#:package FileBasedApp@0.1.0
+
+using FileBasedApp;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+await new CurrentWeatherApplication()
+    .Build()
+    .ConfigureServices()
+    .Run();
+
+class CurrentWeatherApplication : AsyncFileBasedApplication
 {
     public override void SetupServices()
     {
-        // Configure your services here
-        base.SetupServices();
+        // Configure options
+        this._serviceCollection.Configure<CurrentWeatherApplicationOptions>(this._configuration.GetSection(nameof(CurrentWeatherApplicationOptions)));
+
+        // Register HttpClient factory
+        this._serviceCollection.AddHttpClient();
     }
 
     public override async Task Run()
     {
-        // Your asynchronous application logic here
+        var httpClient = this._serviceProvider.GetRequiredService<HttpClient>();
+        var logger = this._serviceProvider.GetRequiredService<ILogger<CurrentWeatherApplication>>();
+        var options = this._serviceProvider.GetRequiredService<IOptions<CurrentWeatherApplicationOptions>>();
+
+        logger.LogInformation("Application is running.");
+        logger.LogInformation("Using Latitude: {Latitude}, Longitude: {Longitude}", options.Value.Latitude, options.Value.Longitude);
+
+        var response = await httpClient.GetAsync($"{options.Value.WeatherApiUrl}?latitude={options.Value.Latitude}&longitude={options.Value.Longitude}&current_weather=true");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            logger.LogInformation("Received weather data: {@content}", content);
+        }
+        else
+        {
+            logger.LogError("Failed to fetch weather data. Status Code: {@statusCode}", response.StatusCode);
+        }
     }
 }
 
-// Usage example:
-public static async Task Main(string[] args)
+class CurrentWeatherApplicationOptions
 {
-    var app = new MyAsyncApp();
-    app.Build().ConfigureServices();
-    await app.Run();
+    public string Latitude { get; set; } = string.Empty;
+
+    public string Longitude { get; set; } = string.Empty;
+
+    public string WeatherApiUrl { get; set; } = string.Empty;
 }
 ```
 
-## Publishing to NuGet
+Save this to `appsettings.CurrentWeatherApplication.json`
 
-This project is configured to automatically publish to NuGet.org using GitHub Actions.
-
-### Prerequisites
-
-1. A NuGet.org API key stored as a GitHub secret named `NUGET_API_KEY`
-
-### Publishing a New Version
-
-#### Option 1: Create a GitHub Release (Recommended)
-
-1. Create a new tag with the version number (e.g., `v1.0.0`)
-2. Push the tag to GitHub
-3. Create a GitHub release from the tag
-4. The package will be automatically built and published to NuGet.org
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-# Then create a release on GitHub
+```json
+{
+  "CurrentWeatherApplicationOptions": {
+    "Latitude": "40.589169",
+    "Longitude": "-111.638812",
+    "WeatherApiUrl": "https://api.open-meteo.com/v1/forecast"
+  }
+}
 ```
-
-#### Option 2: Manual Workflow Dispatch
-
-1. Go to the Actions tab in GitHub
-2. Select the "Publish to NuGet" workflow
-3. Click "Run workflow"
-4. Enter the version number (e.g., `1.0.0`)
-5. Click "Run workflow"
 
 ## Building Locally
 
