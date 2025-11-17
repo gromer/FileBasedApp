@@ -55,3 +55,6 @@ nunit-*.xml
 
 # macOS things
 .DS_Store
+
+# Local things
+local.md

@@ -7,7 +7,6 @@ public abstract class FileBasedApplication : FileBasedApplicationBase
     public FileBasedApplication Build()
     {
         this.SetupBuild();
-        
         this._configuration = this._configurationBuilder.Build();
         return this;
     }
@@ -15,8 +14,7 @@ public abstract class FileBasedApplication : FileBasedApplicationBase
     public FileBasedApplication ConfigureServices()
     {
         this.SetupServices();
-
-        this._serviceProvider = this._serviceCollection.BuildServiceProvider(this._serviceProviderOptions);
+        this.BuildServiceProvider();
         return this;
     }
 

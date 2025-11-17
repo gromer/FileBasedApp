@@ -14,24 +14,35 @@ public abstract class FileBasedApplicationBase
 
     protected IServiceProvider? _serviceProvider;
 
-    protected ServiceProviderOptions _serviceProviderOptions = new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true };
-
+    private readonly ServiceProviderOptions _serviceProviderOptions;
+    
     public FileBasedApplicationBase()
     {
         this._configurationBuilder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile($"appsettings.{this.GetType().Name}.json",
                 optional: true,
-                reloadOnChange: true);
+                reloadOnChange: false);
 
-        this._serviceCollection = new ServiceCollection();
-        this._serviceCollection.AddLogging(builder =>
+        this._serviceCollection = new IServiceCollection()
+            .AddLogging(builder =>
+            {
+                builder.AddSimpleConsole();
+            });
+
+        this._serviceProviderOptions = new ServiceProviderOptions
         {
-            builder.AddSimpleConsole();
-        });
+            ValidateScopes = true,
+            ValidateOnBuild = true
+        };
     }
 
     public virtual void SetupBuild() { }
 
     public virtual void SetupServices() { }
+
+    internal void BuildServiceProvider()
+    {
+        this._serviceProvider = this._serviceCollection.BuildServiceProvider(this._serviceProviderOptions);
+    }
 }
