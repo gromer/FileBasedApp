@@ -14,6 +14,8 @@ public abstract class FileBasedApplicationBase
 
     protected IServiceProvider? _serviceProvider;
 
+    protected ServiceProviderOptions _serviceProviderOptions = new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true };
+
     public FileBasedApplicationBase()
     {
         this._configurationBuilder = new ConfigurationBuilder()
