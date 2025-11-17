@@ -15,7 +15,7 @@ public abstract class FileBasedApplicationBase
     protected IServiceProvider? _serviceProvider;
 
     private readonly ServiceProviderOptions _serviceProviderOptions;
-    
+
     public FileBasedApplicationBase()
     {
         this._configurationBuilder = new ConfigurationBuilder()
@@ -24,7 +24,7 @@ public abstract class FileBasedApplicationBase
                 optional: true,
                 reloadOnChange: false);
 
-        this._serviceCollection = new IServiceCollection()
+        this._serviceCollection = new ServiceCollection()
             .AddLogging(builder =>
             {
                 builder.AddSimpleConsole();
