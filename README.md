@@ -75,7 +75,8 @@ class CurrentWeatherApplication : AsyncFileBasedApplication
 
     public override async Task Run()
     {
-        var httpClient = this._serviceProvider.GetRequiredService<HttpClient>();
+        var httpClientFactory = this._serviceProvider.GetRequiredService<IHttpClientFactory>();
+        var httpClient = httpClientFactory.CreateClient();
         var logger = this._serviceProvider.GetRequiredService<ILogger<CurrentWeatherApplication>>();
         var options = this._serviceProvider.GetRequiredService<IOptions<CurrentWeatherApplicationOptions>>();
 
