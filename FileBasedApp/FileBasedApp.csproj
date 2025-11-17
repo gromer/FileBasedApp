@@ -4,6 +4,20 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>FileBasedApp</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>gromer</Authors>
+    <Company>gromer</Company>
+    <Description>A base library for building file-based applications with dependency injection and configuration support.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/gromer/FileBasedApp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gromer/FileBasedApp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>file-based;dependency-injection;configuration;logging</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +28,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
 </Project>
