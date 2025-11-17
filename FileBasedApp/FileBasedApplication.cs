@@ -18,7 +18,7 @@ public abstract class FileBasedApplication : FileBasedApplicationBase
         Console.WriteLine("ConfigureServices");
         this.SetupServices();
 
-        this._serviceProvider = this._serviceCollection.BuildServiceProvider();
+        this._serviceProvider = this._serviceCollection.BuildServiceProvider(this._serviceProviderOptions);
         return this;
     }
 
