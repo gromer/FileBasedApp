@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace FileBasedApp;
 
 public abstract class FileBasedApplication : FileBasedApplicationBase
@@ -7,7 +5,7 @@ public abstract class FileBasedApplication : FileBasedApplicationBase
     public FileBasedApplication Build()
     {
         this.SetupBuild();
-        this._configuration = this._configurationBuilder.Build();
+        this.BuildConfiguration();
         return this;
     }
 
