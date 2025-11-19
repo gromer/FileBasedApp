@@ -6,29 +6,30 @@ namespace FileBasedApp;
 
 public abstract class FileBasedApplicationBase
 {
-    protected IConfiguration? _configuration;
-
-    protected readonly IConfigurationBuilder _configurationBuilder;
-
-    protected readonly IServiceCollection _serviceCollection;
-
-    protected IServiceProvider? _serviceProvider;
-
     private readonly ServiceProviderOptions _serviceProviderOptions;
 
-    public FileBasedApplicationBase()
+    protected IConfiguration? Configuration { get; private set; }
+
+    // ReSharper disable MemberCanBePrivate.Global
+    protected IConfigurationBuilder ConfigurationBuilder { get; }
+    // ReSharper restore MemberCanBePrivate.Global
+
+    // ReSharper disable MemberCanBePrivate.Global
+    protected IServiceCollection ServiceCollection { get; }
+    // ReSharper restore MemberCanBePrivate.Global
+
+    protected IServiceProvider? ServiceProvider { get; private set; }
+
+    protected FileBasedApplicationBase()
     {
-        this._configurationBuilder = new ConfigurationBuilder()
+        this.ConfigurationBuilder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile($"appsettings.{this.GetType().Name}.json",
                 optional: true,
                 reloadOnChange: false);
 
-        this._serviceCollection = new ServiceCollection()
-            .AddLogging(builder =>
-            {
-                builder.AddSimpleConsole();
-            });
+        this.ServiceCollection = new ServiceCollection()
+            .AddLogging(builder => builder.AddSimpleConsole());
 
         this._serviceProviderOptions = new ServiceProviderOptions
         {
@@ -37,12 +38,11 @@ public abstract class FileBasedApplicationBase
         };
     }
 
-    public virtual void SetupBuild() { }
+    protected virtual void SetupBuild() { }
 
-    public virtual void SetupServices() { }
+    protected virtual void SetupServices() { }
 
-    internal void BuildServiceProvider()
-    {
-        this._serviceProvider = this._serviceCollection.BuildServiceProvider(this._serviceProviderOptions);
-    }
+    internal void BuildConfiguration() => this.Configuration = this.ConfigurationBuilder.Build();
+
+    internal void BuildServiceProvider() => this.ServiceProvider = this.ServiceCollection.BuildServiceProvider(this._serviceProviderOptions);
 }
