@@ -58,3 +58,7 @@ nunit-*.xml
 
 # Local things
 local.md
+
+# Jetbrains Rider specific
+# Default ignored files
+.idea
