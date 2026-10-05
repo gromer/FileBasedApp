@@ -31,22 +31,34 @@ jobs:
     - name: Build
       run: dotnet build FileBasedApp/FileBasedApp.csproj -c Release --no-restore
     
-    - name: Set version from tag
-      if: github.event_name == 'release'
-      run: |
-        VERSION=${GITHUB_REF#refs/tags/v}
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-    
-    - name: Set version from input
-      if: github.event_name == 'workflow_dispatch'
-      run: |
-        echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-    
     - name: Pack
-      run: dotnet pack FileBasedApp/FileBasedApp.csproj -c Release --no-build -o ./artifacts /p:PackageVersion=${{ env.VERSION }}
+      shell: bash
+      env:
+        VERSION_INPUT: ${{ github.event.inputs.version }}
+      run: |
+        case "$GITHUB_EVENT_NAME" in
+          release) VERSION=${GITHUB_REF#refs/tags/v} ;;
+          workflow_dispatch) VERSION=$VERSION_INPUT ;;
+          *) echo "Unsupported version source" >&2; exit 1 ;;
+        esac
+
+        # Three-part SemVer, with optional prerelease and build metadata.
+        # Numeric core/prerelease identifiers cannot have leading zeroes.
+        number='(0|[1-9][0-9]*)'
+        prerelease='(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)'
+        metadata='[0-9A-Za-z-]+'
+        version_pattern="^${number}\.${number}\.${number}(-${prerelease}(\.${prerelease})*)?(\+${metadata}(\.${metadata})*)?$"
+        if [[ ! $VERSION =~ $version_pattern ]]; then
+          echo "Invalid package version: expected MAJOR.MINOR.PATCH with optional SemVer prerelease/build metadata" >&2
+          exit 1
+        fi
+
+        dotnet pack FileBasedApp/FileBasedApp.csproj -c Release --no-build -o ./artifacts "/p:PackageVersion=$VERSION"
     
     - name: Publish to NuGet
-      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
     
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
